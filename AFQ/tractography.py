@@ -121,7 +121,7 @@ def track(params_file, directions="det", max_angle=30., sphere=None,
 
 
 def _local_tracking(seeds, dg, threshold_classifier, affine,
-                    step_size=0.5, min_length=10, max_length=250):
+                    step_size=0.5, min_length=30, max_length=250):
     """
     Helper function
     """
