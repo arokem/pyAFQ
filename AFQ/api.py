@@ -4,7 +4,6 @@ import dask.dataframe as ddf
 import glob
 import os
 import os.path as op
-from pathlib import PurePath
 
 import numpy as np
 import nibabel as nib
