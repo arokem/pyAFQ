@@ -255,7 +255,7 @@ def read_templates():
     return template_dict
 
 
-def fetch_hcp(subjects):
+def fetch_hcp(subjects, hcp_bucket='hcp-openaccess'):
     """
     Fetch HCP diffusion data and arrange it in a manner that resembles the
     BIDS [1]_ specification.
@@ -264,6 +264,10 @@ def fetch_hcp(subjects):
     ----------
     subjects : list
        Each item is an integer, identifying one of the HCP subjects
+
+    hcp_bucket : string
+       The name of the HCP bucket (this usually in the default location:
+       "hcp-openaccess").
 
     Returns
     -------
@@ -289,12 +293,12 @@ def fetch_hcp(subjects):
     boto3.setup_default_session(profile_name='hcp')
     s3 = boto3.resource('s3')
     try:
-        bucket = s3.Bucket('hcp-openaccess')
+        bucket = s3.Bucket(hcp_bucket)
         # This will trigger the client error in case this S3 bucket
         # doesn't exist
         list(bucket.objects.all())
     except botocore.exceptions.ClientError:
-        bucket = s3.Bucket('hcp-openaccess-temp')
+        bucket = s3.Bucket(hcp_bucket)
 
     base_dir = op.join(afq_home, 'HCP', 'derivatives', 'preafq')
     if not os.path.exists(base_dir):
