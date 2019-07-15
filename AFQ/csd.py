@@ -31,7 +31,7 @@ def _fit(gtab, data, mask, response=None, sh_order=8,
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
-            sh_order=8, lambda_=1, tau=0.1, out_dir=None):
+            sh_order=8, lambda_=1, tau=0.1, out_dir=None, b0_threshold=50):
     """
     Fit the CSD model and save file with SH coefficients.
 
@@ -56,7 +56,9 @@ def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
     -------
     fname : the full path to the file containing the SH coefficients.
     """
-    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files)
+    img, data, gtab, mask = ut.prepare_data(data_files, bval_files, bvec_files,
+                                            b0_threshold=b0_threshold,
+                                            mask=mask)
 
     csdfit = _fit(gtab, data, mask, response=response, sh_order=sh_order,
                   lambda_=lambda_, tau=tau)

@@ -18,33 +18,56 @@ import dipy.tracking.streamline as dts
 from dipy.io.streamline import save_tractogram
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
-
+import dipy.stats.analysis as dsa
 
 import AFQ.data as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.dti as dti
+import AFQ.csd as csd
 import AFQ.segmentation as seg
 
-dpd.fetch_stanford_hardi()
 
-hardi_dir = op.join(fetcher.dipy_home, "stanford_hardi")
-hardi_fdata = op.join(hardi_dir, "HARDI150.nii.gz")
-hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
-hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
+hardi_fdata = op.join(afd.afq_home, "HCP", "derivatives", "dmriprep", "sub-100206", "sess-01", "dwi", "sub-100206_dwi.nii.gz")
+hardi_fbval = op.join(afd.afq_home, "HCP", "derivatives", "dmriprep", "sub-100206", "sess-01", "dwi", "sub-100206_dwi.bval")
+hardi_fbvec = op.join(afd.afq_home, "HCP", "derivatives", "dmriprep", "sub-100206", "sess-01", "dwi", "sub-100206_dwi.bvec")
 
 img = nib.load(hardi_fdata)
+
+
+print("Calculating mask...")
+if not op.exists('./brain_mask.nii.gz'):
+    brain_mask_file = seg.median_otsu_b0(hardi_fdata, hardi_fbval, hardi_fbvec,
+                                         out_dir='.', file_prefix=None,
+                                         b0_threshold=50, median_radius=4,
+                                         numpass=1, autocrop=False, dilate=10)
+
+brain_mask = nib.load('./brain_mask.nii.gz')
+
 
 print("Calculating DTI...")
 if not op.exists('./dti_FA.nii.gz'):
     dti_params = dti.fit_dti(hardi_fdata, hardi_fbval, hardi_fbvec,
-                             out_dir='.')
+                             out_dir='.', b0_threshold=50, mask=brain_mask)
 else:
     dti_params = {'FA': './dti_FA.nii.gz',
                   'params': './dti_params.nii.gz'}
 
 FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
+
+print("Calculating CSD...")
+if not op.exists('./csd_params.nii.gz'):
+    csd_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
+                             out_dir='.', b0_threshold=50, mask=brain_mask)
+    boom
+else:
+    dti_params = {'FA': './dti_FA.nii.gz',
+                  'params': './dti_params.nii.gz'}
+
+FA_img = nib.load(dti_params['FA'])
+FA_data = FA_img.get_fdata()
+
 
 
 print("Registering to template...")
@@ -153,7 +176,7 @@ for name in bundle_names:
                 [s for s in fiber_groups[name + hemi] if s.shape[0] > 100],
                 np.linalg.inv(img.affine)))
 
-        weights = seg.gaussian_weights(streamlines)
+        weights = dsa.gaussian_weights(streamlines)
         profile = seg.calculate_tract_profile(FA_data,
                                               streamlines,
                                               weights=weights)

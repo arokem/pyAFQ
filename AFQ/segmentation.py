@@ -1,3 +1,4 @@
+import os.path as op
 import numpy as np
 from scipy.spatial.distance import mahalanobis, cdist
 
@@ -8,6 +9,7 @@ import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
 from dipy.align.streamlinear import whole_brain_slr
+from dipy.segment.mask import median_otsu
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -484,3 +486,58 @@ def recobundles(streamlines, bundle_dict):
         oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
         fiber_groups[bundle] = oriented_sl
     return fiber_groups
+
+
+def median_otsu_b0(data_files, bval_files, bvec_files, out_dir='.',
+                   file_prefix=None, b0_threshold=50, median_radius=4,
+                   numpass=1, autocrop=False, dilate=10):
+    """
+    Calculate a brain mask from  the mean b0 image
+
+        Parameters
+    ----------
+    data_files : str or list
+        Files containing DWI data. If this is a str, that's the full path to a
+        single file. If it's a list, each entry is a full path.
+    bval_files : str or list
+        Equivalent to `data_files`.
+    bvec_files : str or list
+        Equivalent to `data_files`.
+    out_dir : str, optional
+        A full path to a directory to store the maps that get computed.
+        Default: maps get stored in the same directory as the last DWI file
+        in `data_files`.
+    b0_threshold : float
+    median_radius : int
+        Parameter passed to `median_otsu`.
+    numpass : int
+        Parameter passed to `median_otsu`.
+    autocrop : False
+        Parameter passed to `median_otsu`.
+    dilate : int
+        Parameter passed to `median_otsu`.
+    """
+    img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
+                                            bvec_files,
+                                            b0_threshold=b0_threshold)
+
+    mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
+    _, brain_mask = median_otsu(mean_b0, median_radius=median_radius,
+                                numpass=numpass, autocrop=autocrop,
+                                dilate=dilate)
+
+    if out_dir is None:
+        if isinstance(data_files, list):
+            out_dir = op.join(op.split(data_files[0])[0], 'median_otsu')
+        else:
+            out_dir = op.join(op.split(data_files)[0], 'median_otsu')
+    if file_prefix is None:
+        file_prefix = ''
+
+    if not op.exists(out_dir):
+        os.makedirs(out_dir)
+
+    out_file = op.join(out_dir, file_prefix + 'brain_mask.nii.gz')
+    nib.save(nib.Nifti1Image(brain_mask.astype(int), img.affine), out_file)
+
+    return out_file
