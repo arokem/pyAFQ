@@ -38,7 +38,8 @@ def prepare_data(data_files, bval_files, bvec_files, mask=None,
 
     # Load the mask if it is a string
     if isinstance(mask, str):
-        mask = nib.load(mask).get_fdata().astype(bool)
+        mask = nib.load(mask)
+    mask = mask.get_fdata().astype(bool)
 
     data = []
     bvals = []
