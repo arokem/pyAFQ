@@ -57,17 +57,12 @@ FA_img = nib.load(dti_params['FA'])
 FA_data = FA_img.get_fdata()
 
 print("Calculating CSD...")
-if not op.exists('./csd_params.nii.gz'):
+if not op.exists('./csd_sh_coeff.nii.gz'):
     csd_params = csd.fit_csd(hardi_fdata, hardi_fbval, hardi_fbvec,
                              out_dir='.', b0_threshold=50, mask=brain_mask)
-    boom
+
 else:
-    dti_params = {'FA': './dti_FA.nii.gz',
-                  'params': './dti_params.nii.gz'}
-
-FA_img = nib.load(dti_params['FA'])
-FA_data = FA_img.get_fdata()
-
+    csd_params = './csd_sh_coeff.nii.gz'
 
 
 print("Registering to template...")
@@ -96,7 +91,7 @@ for name in bundle_names:
         uid += 1
 
 print("Tracking...")
-if not op.exists('dti_streamlines.trk'):
+if not op.exists('csd_streamlines.trk'):
     seed_roi = np.zeros(img.shape[:-1])
     for name in bundle_names:
         for hemi in ['_R', '_L']:
@@ -126,12 +121,12 @@ if not op.exists('dti_streamlines.trk'):
                          sl_as_idx[:, 2]] = 1
 
     nib.save(nib.Nifti1Image(seed_roi, img.affine), 'seed_roi.nii.gz')
-    streamlines = aft.track(dti_params['params'], seed_mask=seed_roi,
+    streamlines = aft.track(csd_params, seed_mask=seed_roi,
                             stop_mask=FA_data, stop_threshold=0.1)
 
-    save_tractogram('./dti_streamlines.trk', streamlines, np.eye(4))
+    save_tractogram('./csd_streamlines.trk', streamlines, np.eye(4))
 else:
-    tg = nib.streamlines.load('./dti_streamlines.trk').tractogram
+    tg = nib.streamlines.load('./csd_streamlines.trk').tractogram
     streamlines = tg.streamlines
 
 fiber_groups = {}
