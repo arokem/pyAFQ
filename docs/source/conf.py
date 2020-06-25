@@ -46,7 +46,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
     'autoapi.extension',
     'numpydoc',
@@ -173,12 +172,6 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
-sphinx_gallery_conf = {
-     # path to your examples scripts
-     'examples_dirs': '../../examples',
-     # path where to save gallery generated examples
-     'gallery_dirs': 'auto_examples',
-}
 
 # Auto API
 autoapi_type = 'python'
