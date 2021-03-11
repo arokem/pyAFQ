@@ -10,11 +10,9 @@ from dipy.reconst import shm
 import dipy.data as dpd
 import AFQ.utils.models as ut
 
-# Monkey patch fixed spherical harmonics for conda and fixed solve_qp from
-# DIPY dev:
-from AFQ._fixes import spherical_harmonics, solve_qp
+# Monkey patch fixed spherical harmonics for conda:
+from AFQ._fixes import spherical_harmonics
 shm.spherical_harmonics = spherical_harmonics
-mcsd.solve_qp = solve_qp
 
 __all__ = ["fit_csd"]
 
