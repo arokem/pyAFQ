@@ -94,9 +94,10 @@ RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
 def display_string(scalar_name):
     if isinstance(scalar_name, str):
-        return scalar_name.replace("_", " ").upper()
+        return scalar_name.replace("_", " ")#.upper()
     else:
-        return [sn.replace("_", " ").upper() for sn in scalar_name]
+        # return [sn.replace("_", " ").upper() for sn in scalar_name]
+        return [sn.replace("_", " ") for sn in scalar_name]
 
 
 def gen_color_dict(bundles):

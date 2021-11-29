@@ -87,7 +87,7 @@ RECO_UNIQUE = [
     'V', 'CC', 'F_L_R']
 
 PEDIATRIC_BUNDLES = [
-    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MLF", "SLF", "UNC"]
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
@@ -375,7 +375,7 @@ class PediatricBundleDict(BundleDict):
                 "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
                 "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
                 "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
-                "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
+                "ARC_L", "ARC_R", "MLF_L", "MLF_R"]
 
             prob_maps = pediatric_templates[
                 'UNCNeo_JHU_tracts_prob-for-babyAFQ']
@@ -433,12 +433,13 @@ class PediatricBundleDict(BundleDict):
                                 prob_map_order.index(name + hemi)],
                             'uid': uid}
                         uid += 1
-                elif name == "MdLF":
+                elif name == "MLF":
                     for hemi in ['_R', '_L']:
+                        sub_name = "MdLF"
                         pediatric_bundles[name + hemi] = {
                             'ROIs': [
-                                pediatric_templates[name + '_roi1' + hemi],
-                                pediatric_templates[name + '_roi2' + hemi]],
+                                pediatric_templates[sub_name + '_roi1' + hemi],
+                                pediatric_templates[sub_name + '_roi2' + hemi]],
                             'rules': [True, True],
                             'cross_midline': False,
                             # reuse probability map from ILF
