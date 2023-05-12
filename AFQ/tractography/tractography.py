@@ -29,7 +29,7 @@ def get_percentile_threshold(mask, threshold):
 
 
 def track(params_file, directions="prob", max_angle=30., sphere=None,
-          seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
+          seed_mask=None, seed_threshold=0.1, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
           min_length=50, max_length=250, odf_model="CSD",
           tracker="local"):
@@ -56,7 +56,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Default to the entire volume (all ones).
     seed_threshold : float, optional.
         A value of the seed_mask above which tracking is seeded.
-        Default to 0.
+        Default to 0.1
     n_seeds : int or 2D array, optional.
         The seeding density: if this is an int, it is is how many seeds in each
         voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
